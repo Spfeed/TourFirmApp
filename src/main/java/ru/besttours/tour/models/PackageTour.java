@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Set;
 
@@ -50,7 +51,7 @@ public class PackageTour {
 
     @Column(name = "cost_pack")
     @NotNull(message = "Стоимость тура не может быть пустой!")
-    private double costPack;
+    private BigDecimal costPack;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "number_id", referencedColumnName = "id")
@@ -87,7 +88,7 @@ public class PackageTour {
     public PackageTour() {}
 
     public PackageTour(String name, Date dateStart, int duration, int numAdults, int numChildren,
-                       String description, double costPack, Number number, City beginPlace,
+                       String description, BigDecimal costPack, Number number, City beginPlace,
                        City endPlace, FoodType foodType, TourOperator tourOperator, Transfer transfer) {
         this.name = name;
         this.dateStart = dateStart;
@@ -160,11 +161,11 @@ public class PackageTour {
         this.description = description;
     }
 
-    public double getCostPack() {
+    public BigDecimal getCostPack() {
         return costPack;
     }
 
-    public void setCostPack(double costPack) {
+    public void setCostPack(BigDecimal costPack) {
         this.costPack = costPack;
     }
 
