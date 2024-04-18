@@ -34,7 +34,7 @@ public class City {
     @JoinTable(
             name = "city_photo",
             joinColumns = @JoinColumn(name = "city_id"),
-            inverseJoinColumns = @JoinColumn(name = "photo_id")
+            inverseJoinColumns = @JoinColumn(name = "photos_id")
     )
     private Set<Photo> photos;
 

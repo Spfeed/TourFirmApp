@@ -55,7 +55,7 @@ public class Country {
     @JoinTable(
             name = "country_photo", //промежуточная таблица
             joinColumns = @JoinColumn(name = "country_id"), //внешний ключ для страны
-            inverseJoinColumns = @JoinColumn(name = "photo_id") //внешний ключ для фото
+            inverseJoinColumns = @JoinColumn(name = "photos_id") //внешний ключ для фото
     )
     private Set<Photo> photos; //set, так как нужны уникальные объекты
 

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +25,7 @@ public class Hotel {
 
     @Column(name = "rating")
     @NotNull(message = "Рейтинг отеля не должен быть пустым!")
-    private double rating;
+    private BigDecimal rating;
 
     @Column(name = "beach_line")
     @NotNull(message = "Линия пляжа не может быть пустой! Если ее нет поставьте 0")
@@ -46,7 +47,7 @@ public class Hotel {
     @JoinTable(
             name="hotel_photo",
             joinColumns = @JoinColumn(name = "hotel_id"),
-            inverseJoinColumns = @JoinColumn(name = "photo_id")
+            inverseJoinColumns = @JoinColumn(name = "photos_id")
     )
     private Set<Photo> photos;
 
@@ -57,7 +58,7 @@ public class Hotel {
         this.photos = new HashSet<>();
     }
 
-    public Hotel(String name, double rating, int beachLine, String information, String services, City city) {
+    public Hotel(String name, BigDecimal rating, int beachLine, String information, String services, City city) {
         this.name = name;
         this.rating = rating;
         this.beachLine = beachLine;
@@ -82,11 +83,11 @@ public class Hotel {
         this.name = name;
     }
 
-    public double getRating() {
+    public BigDecimal getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
+    public void setRating(BigDecimal rating) {
         this.rating = rating;
     }
 

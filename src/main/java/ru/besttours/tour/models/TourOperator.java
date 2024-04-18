@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,13 +33,13 @@ public class TourOperator {
 
     @Column(name = "rating")
     @NotNull(message = "Рейтинг туроператора не может быть пустым!")
-    private double rating;
+    private BigDecimal rating;
 
     @ManyToMany
     @JoinTable(
             name = "tour_operator_photo",
             joinColumns = @JoinColumn(name = "tour_operator_id"),
-            inverseJoinColumns = @JoinColumn(name = "photo_id")
+            inverseJoinColumns = @JoinColumn(name = "photos_id")
     )
     private Set<Photo> photos;
 
@@ -49,7 +50,7 @@ public class TourOperator {
         this.photos = new HashSet<>();
     }
 
-    public TourOperator(String name, String description, String site, double rating) {
+    public TourOperator(String name, String description, String site, BigDecimal rating) {
         this.name = name;
         this.description = description;
         this.site = site;
@@ -88,11 +89,11 @@ public class TourOperator {
         this.site = site;
     }
 
-    public double getRating() {
+    public BigDecimal getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
+    public void setRating(BigDecimal rating) {
         this.rating = rating;
     }
 
