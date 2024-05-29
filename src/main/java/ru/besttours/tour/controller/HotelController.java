@@ -68,6 +68,12 @@ public class HotelController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{hotelId}/photos")
+    public List<String> getHotelPhotos (@PathVariable int hotelId) {
+        List<String> photos = hotelService.getHotelPhotos(hotelId);
+        return photos;
+    }
+
     private HotelDTO convertToHotelDTO(Hotel hotel){
         return modelMapper.map(hotel, HotelDTO.class);
     }

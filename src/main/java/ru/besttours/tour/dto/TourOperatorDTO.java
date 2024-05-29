@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 public class TourOperatorDTO {
 
@@ -15,6 +16,16 @@ public class TourOperatorDTO {
     private String site;
 
     private BigDecimal rating;
+
+    public Set<String> getPhotoUrls() {
+        return photoUrls;
+    }
+
+    public void setPhotoUrls(Set<String> photoUrls) {
+        this.photoUrls = photoUrls;
+    }
+
+    private Set<String> photoUrls;
 
     public String getName() {
         return name;

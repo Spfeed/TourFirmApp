@@ -4,9 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.besttours.tour.models.Hotel;
+import ru.besttours.tour.models.Photo;
 import ru.besttours.tour.repo.HotelRepository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional(readOnly = true)
@@ -51,6 +54,18 @@ public class HotelService {
 
     public Hotel findByName(String name) {
         return hotelRepository.findByName(name).orElse(null);
+    }
+
+    public List<String> getHotelPhotos (int id) {
+        Hotel hotel = findOne(id);
+        Set<Photo> hotelPhotos = hotel.getPhotos();
+        List<String> photos = new ArrayList<>();
+
+        for (Photo photo : hotelPhotos) {
+            photos.add(photo.getFilePath());
+        }
+
+        return photos;
     }
 
 }

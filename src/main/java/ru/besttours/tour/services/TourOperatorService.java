@@ -3,10 +3,14 @@ package ru.besttours.tour.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.besttours.tour.dto.TourOperatorDTO;
+import ru.besttours.tour.models.Photo;
 import ru.besttours.tour.models.TourOperator;
 import ru.besttours.tour.repo.TourOperatorRepository;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -41,5 +45,25 @@ public class TourOperatorService {
     @Transactional
     public void delete(int id) {
         tourOperatorRepository.deleteById(id);
+    }
+
+    //OTHER METHODS
+
+    public List<TourOperatorDTO> findAllWithPhotos() {
+        List<TourOperator> tourOperators = tourOperatorRepository.findAll();
+        return tourOperators.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    private TourOperatorDTO mapToDTO(TourOperator tourOperator) {
+        Set<String> photoUrls = tourOperator.getPhotos().stream()
+                .map(Photo::getFilePath)
+                .collect(Collectors.toSet());
+        TourOperatorDTO dto = new TourOperatorDTO();
+        dto.setName(tourOperator.getName());
+        dto.setDescription(tourOperator.getDescription());
+        dto.setSite(tourOperator.getSite());
+        dto.setRating(tourOperator.getRating());
+        dto.setPhotoUrls(photoUrls);
+        return dto;
     }
 }

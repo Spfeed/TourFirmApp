@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "package_tour_user")
-public class PackageTourUserBid {
+public class PackageTourBid {
 
     @EmbeddedId
     private PackageTourUserId id;
@@ -21,9 +21,9 @@ public class PackageTourUserBid {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    public PackageTourUserBid() {}
+    public PackageTourBid() {}
 
-    public PackageTourUserBid(PackageTourUserId id, boolean status, Date createdAt) {
+    public PackageTourBid(PackageTourUserId id, boolean status, Date createdAt) {
         this.id = id;
         this.status = status;
         this.createdAt = createdAt;

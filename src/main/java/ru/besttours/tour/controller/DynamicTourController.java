@@ -90,6 +90,8 @@ public class DynamicTourController {
 
     //OTHER ENDPOINTS
 
+    //TODO эндпоинт создания тура с автоматическим добавлением в отношение заявка на динамический тур
+
     private DynamicTourDTO convertToDynamicTourDTO(DynamicTour dynamicTour){
         return modelMapper.map(dynamicTour, DynamicTourDTO.class);
     }

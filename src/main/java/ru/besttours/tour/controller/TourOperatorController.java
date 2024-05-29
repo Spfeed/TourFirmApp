@@ -59,6 +59,14 @@ public class TourOperatorController {
         return ResponseEntity.noContent().build();
     }
 
+    //OTHER ENDPOINTS
+    @GetMapping("/withPhotos")
+    public ResponseEntity<List<TourOperatorDTO>> getAllTourOperatorsWithPhotos () {
+        List<TourOperatorDTO> tourOperatorDTOS = tourOperatorService.findAllWithPhotos();
+        return ResponseEntity.ok(tourOperatorDTOS);
+    }
+
+
     private TourOperatorDTO convertToTourOperatorDTO(TourOperator tourOperator){
         return modelMapper.map(tourOperator, TourOperatorDTO.class);
     }

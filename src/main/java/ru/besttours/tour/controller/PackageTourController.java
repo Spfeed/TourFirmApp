@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.besttours.tour.dto.PackageTourDTO;
+import ru.besttours.tour.dto.*;
 import ru.besttours.tour.models.*;
 import ru.besttours.tour.models.Number;
 import ru.besttours.tour.services.*;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -99,6 +101,36 @@ public class PackageTourController {
     public PackageTourDTO getPackageTourByName(@PathVariable String namePackageTour){
         //TODO обработка исключений
         return convertToPackageTourDTO(packageTourService.findByName(namePackageTour));
+    }
+
+    @GetMapping("/{cityName}/actual")
+    public ResponseEntity<PackageTourForCountryDTO> getActualTourForCity (@PathVariable String cityName) {
+        PackageTourForCountryDTO actualTour = packageTourService.getActualTourForCity(cityName);
+        return ResponseEntity.ok(actualTour);
+    }
+
+    @PostMapping("/search")
+    ResponseEntity<List<PackageTourForModalDTO>> getToursForModal(@RequestBody SearchTourDTO searchTourDTO) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(searchTourDTO.getStartDate());
+        calendar.add(Calendar.DAY_OF_MONTH, 30);
+        Date endDate = calendar.getTime();
+        List<PackageTourForModalDTO> tours = packageTourService.packageToursForModal(
+                searchTourDTO.getFromId(),
+                searchTourDTO.getToId(),
+                searchTourDTO.getStartDate(),
+                endDate,
+                searchTourDTO.getDays(),
+                searchTourDTO.getAdults(),
+                searchTourDTO.getChildren()
+        );
+        return ResponseEntity.ok(tours);
+    }
+
+    @GetMapping("/{tourId}/info")
+    public ResponseEntity<PackageTourForTourPageDTO> getPackageTourInfo (@PathVariable int tourId) {
+        PackageTourForTourPageDTO tourInfo = packageTourService.getTourInfo(tourId);
+        return ResponseEntity.ok(tourInfo);
     }
 
     private PackageTourDTO convertToPackageTourDTO(PackageTour packageTour){

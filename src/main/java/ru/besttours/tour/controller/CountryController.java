@@ -6,10 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.besttours.tour.dto.CountryDTO;
+import ru.besttours.tour.dto.*;
 import ru.besttours.tour.models.City;
 import ru.besttours.tour.models.Country;
 import ru.besttours.tour.services.CountryService;
+import ru.besttours.tour.services.PackageTourService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,10 +22,13 @@ public class CountryController {
     private final CountryService countryService;
     private final ModelMapper modelMapper;
 
+    private final PackageTourService packageTourService;
+
     @Autowired
-    public CountryController(CountryService countryService, ModelMapper modelMapper) {
+    public CountryController(CountryService countryService, ModelMapper modelMapper, PackageTourService packageTourService) {
         this.countryService = countryService;
         this.modelMapper = modelMapper;
+        this.packageTourService = packageTourService;
     }
 
     //BASED ENDPOINTS
@@ -77,6 +81,35 @@ public class CountryController {
         Country country = countryService.findByName(countryName);
         //TODO обработка исключения
         return countryService.findCities(country);
+    }
+
+    @GetMapping("/names")
+    public List<String> getCountriesNames() {
+        return countryService.findAllNames();
+    }
+
+    @GetMapping("/{countryName}/info")
+    public  ResponseEntity<CountryForCountryPageDTO> getCountryInfo (@PathVariable String countryName) {
+        CountryForCountryPageDTO countryForCountryPageDTO = countryService.getCountryInfo(countryName);
+        return ResponseEntity.ok(countryForCountryPageDTO);
+    }
+
+    @GetMapping("/{countryName}/tours")
+    public ResponseEntity<List<PackageTourForCountryDTO>> getToursByCountryName(@PathVariable String countryName) {
+        List<PackageTourForCountryDTO> tours = packageTourService.getToursByCountry(countryName);
+        return ResponseEntity.ok(tours);
+    }
+
+    @GetMapping("/search-form")
+    public ResponseEntity<List<CountryForSearchFormDTO>> getCountriesForSearchForm() {
+        List<CountryForSearchFormDTO> countries = countryService.getCountriesForSearchForm();
+        return ResponseEntity.ok(countries);
+    }
+
+    @GetMapping("/{countryId}/cities-for-modal")
+    public ResponseEntity<List<CountryForModalDTO>> getCitiesForModal(@PathVariable int countryId) {
+        List<CountryForModalDTO> cities = countryService.getCitiesForModal(countryId);
+        return ResponseEntity.ok(cities);
     }
 
     private CountryDTO convertToCountryDTO(Country country){

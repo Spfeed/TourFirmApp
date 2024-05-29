@@ -7,10 +7,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.besttours.tour.dto.CityDTO;
+import ru.besttours.tour.dto.CityForCityDTO;
+import ru.besttours.tour.dto.CityForSearchFormDTO;
+import ru.besttours.tour.dto.PackageTourForCountryDTO;
 import ru.besttours.tour.models.City;
 import ru.besttours.tour.models.Country;
 import ru.besttours.tour.services.CityService;
 import ru.besttours.tour.services.CountryService;
+import ru.besttours.tour.services.PackageTourService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,11 +27,14 @@ public class CityController {
     private final CountryService countryService;
     private final ModelMapper modelMapper;
 
+    private final PackageTourService packageTourService;
+
     @Autowired
-    public CityController(CityService cityService, CountryService countryService, ModelMapper modelMapper) {
+    public CityController(CityService cityService, CountryService countryService, ModelMapper modelMapper, PackageTourService packageTourService) {
         this.cityService = cityService;
         this.countryService = countryService;
         this.modelMapper = modelMapper;
+        this.packageTourService = packageTourService;
     }
 
     //BASIC ENDPOINTS
@@ -79,6 +86,24 @@ public class CityController {
         City city = cityService.findByName(cityName);
         //TODO исключение если не найден
         return cityService.findAllHotels(city);
+    }
+
+    @GetMapping("/{cityName}/info")
+    public ResponseEntity<CityForCityDTO> getCityInfo(@PathVariable String cityName) {
+        CityForCityDTO cityInfo = cityService.getCityInfo(cityName);
+        return ResponseEntity.ok(cityInfo);
+    }
+
+    @GetMapping("/{cityName}/toursOnPage")
+    public ResponseEntity<List<PackageTourForCountryDTO>> getToursFromCity (@PathVariable String cityName) {
+        List<PackageTourForCountryDTO> tours = packageTourService.getToursByCity(cityName);
+        return ResponseEntity.ok(tours);
+    }
+
+    @GetMapping("/search-form")
+    public ResponseEntity<List<CityForSearchFormDTO>> getCitiesForSearchForm() {
+        List<CityForSearchFormDTO> cities = cityService.getCitiesForSearchForm();
+        return ResponseEntity.ok(cities);
     }
 
     private CityDTO convertToCityDTO(City city){
