@@ -29,18 +29,25 @@ public class SecurityService {
 //    }
 
     public Integer signUp(UserDTO userDTO) {
-        User user = User.builder()
-                .name(userDTO.getName())
-                .fatherName(userDTO.getFatherName() != null ? userDTO.getFatherName() : "")
-                .phoneNumber(userDTO.getPhoneNumber())
-                .lastName(userDTO.getLastName())
-                .email(userDTO.getEmail())
-                .build();
+        // Создание нового объекта User и установка значений напрямую
+        User user = new User();
+        user.setName(userDTO.getName());
+        user.setFatherName(userDTO.getFatherName() != null ? userDTO.getFatherName() : "");
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        user.setLastName(userDTO.getLastName());
+        user.setEmail(userDTO.getEmail());
+
+        // Установка access level и пароля
         user.setAccessLevel(accessLevelService.findOne(1));
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+
+        // Сохранение пользователя в репозиторий
         user = userRepository.save(user);
+
+        // Возвращение ID сохраненного пользователя
         return user.getId();
     }
+
 
     public Integer signIn(String email, String password) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));

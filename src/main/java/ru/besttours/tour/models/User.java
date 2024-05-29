@@ -9,7 +9,6 @@ import lombok.Builder;
 
 @Entity
 @Table(name = "user_tour")
-@Builder
 public class User {
 
     @Id
