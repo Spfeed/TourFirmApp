@@ -44,7 +44,7 @@ public class SecurityService {
 
     public Integer signIn(String email, String password) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
-        if (passwordEncoder.matches(user.getPassword(), password))
+        if (passwordEncoder.matches(password, user.getPassword()))
             return user.getId();
         else
             throw new IllegalArgumentException("Not valid data");
