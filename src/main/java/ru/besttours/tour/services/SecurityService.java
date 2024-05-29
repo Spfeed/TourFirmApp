@@ -50,4 +50,14 @@ public class SecurityService {
             throw new IllegalArgumentException("Not valid data");
     }
 
+    //Нельзя использовать потому что всегда нужно передавать id пользака(чтобы узнать его роль)
+    public boolean checkRole(Integer id, Integer accessLevel) throws IllegalAccessException {
+        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (user.getAccessLevel().getId() >= accessLevel) {
+            return true;
+        }
+        else
+            throw new IllegalArgumentException
+                    ("Unauthorized access");
+    }
 }
