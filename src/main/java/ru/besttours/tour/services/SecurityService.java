@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.besttours.tour.dto.UserDTO;
+import ru.besttours.tour.dto.UserDTOForGlobalState;
 import ru.besttours.tour.models.User;
 import ru.besttours.tour.repo.UserRepository;
 
@@ -28,7 +29,7 @@ public class SecurityService {
 //        userRepository.save(user);
 //    }
 
-    public Integer signUp(UserDTO userDTO) {
+    public UserDTOForGlobalState signUp(UserDTO userDTO) {
         // Создание нового объекта User и установка значений напрямую
         User user = new User();
         user.setName(userDTO.getName());
@@ -44,15 +45,25 @@ public class SecurityService {
         // Сохранение пользователя в репозиторий
         user = userRepository.save(user);
 
-        // Возвращение ID сохраненного пользователя
-        return user.getId();
+        UserDTOForGlobalState dto = new UserDTOForGlobalState();
+        dto.setId(user.getId());
+        dto.setAccessLevel(user.getAccessLevel().getName());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        return dto;
     }
 
 
-    public Integer signIn(String email, String password) {
+    public UserDTOForGlobalState signIn(String email, String password) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
-        if (passwordEncoder.matches(password, user.getPassword()))
-            return user.getId();
+        UserDTOForGlobalState dto = new UserDTOForGlobalState();
+        if (passwordEncoder.matches(password, user.getPassword())) {
+            dto.setId(user.getId());
+            dto.setAccessLevel(user.getAccessLevel().getName());
+            dto.setName(user.getName());
+            dto.setEmail(user.getEmail());
+            return dto;
+        }
         else
             throw new IllegalArgumentException("Not valid data");
     }

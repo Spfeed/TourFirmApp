@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.besttours.tour.dto.CityDTO;
-import ru.besttours.tour.dto.CityForCityDTO;
-import ru.besttours.tour.dto.CityForSearchFormDTO;
-import ru.besttours.tour.dto.PackageTourForCountryDTO;
+import ru.besttours.tour.dto.*;
 import ru.besttours.tour.models.City;
 import ru.besttours.tour.models.Country;
 import ru.besttours.tour.services.CityService;
@@ -81,11 +78,10 @@ public class CityController {
 
     //OTHER ENDPOINTS
 
-    @GetMapping("/hotels/{cityName}")
-    public List<String> getCityHotels(@PathVariable String cityName){
-        City city = cityService.findByName(cityName);
-        //TODO исключение если не найден
-        return cityService.findAllHotels(city);
+    @GetMapping("/hotels/{cityId}")
+    public ResponseEntity<List<HotelForDynTourCreateionDTO>> getCityHotels(@PathVariable int cityId){
+        List<HotelForDynTourCreateionDTO> hotels = cityService.findAllHotels(cityId);
+        return ResponseEntity.ok(hotels);
     }
 
     @GetMapping("/{cityName}/info")

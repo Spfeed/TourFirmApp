@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.besttours.tour.dto.PackageTourForCountryDTO;
+import ru.besttours.tour.dto.PackageTourForHistoryDTO;
 import ru.besttours.tour.dto.PackageTourForModalDTO;
 import ru.besttours.tour.dto.PackageTourForTourPageDTO;
 import ru.besttours.tour.models.*;
@@ -152,6 +153,40 @@ public class PackageTourService {
 
         return dto;
     }
+
+    public PackageTourForHistoryDTO getTourInfoForHistory (int id) {
+        PackageTour packageTour = packageTourRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Тур с таким id не найден"));
+
+        PackageTourForHistoryDTO dto = new PackageTourForHistoryDTO();
+
+        dto.setTourName(packageTour.getName());
+        dto.setDateStart(packageTour.getDateStart());
+        dto.setDuration(packageTour.getDuration());
+        dto.setNumAdults(packageTour.getNumAdults());
+        dto.setNumChildren(packageTour.getNumChildren());
+        dto.setCityStart(packageTour.getBeginPlace().getName());
+        dto.setCityEnd(packageTour.getEndPlace().getName());
+        dto.setHotelName(packageTour.getNumber().getHotel().getName());
+        dto.setNumberName(packageTour.getNumber().getNumberType().getName());
+        dto.setFoodTypeName(packageTour.getFoodType().getName());
+        dto.setTourOp(packageTour.getTourOperator().getName());
+        dto.setTransfer(packageTour.getTransfer().getCompany());
+
+        Set<ru.besttours.tour.models.Service> services = packageTour.getServices();
+
+        List<String> servicesName = new ArrayList<>();
+
+        for (ru.besttours.tour.models.Service service : services) {
+            servicesName.add(service.getName());
+        }
+
+        dto.setServices(servicesName);
+
+        return dto;
+    }
+
+    //PRIVATE METHODS
 
     private List<PackageTourForModalDTO> convertToModalDTO (List<PackageTour> tours) {
         List<PackageTourForModalDTO> dtos = new ArrayList<>();

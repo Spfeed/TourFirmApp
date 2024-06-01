@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.besttours.tour.dto.NumberDTO;
+import ru.besttours.tour.dto.NumberToFormDTO;
 import ru.besttours.tour.models.Hotel;
 import ru.besttours.tour.models.Number;
 import ru.besttours.tour.models.NumberType;
@@ -73,6 +74,13 @@ public class NumberController {
         numberService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{hotelId}/numbersForForm")
+    public ResponseEntity<List<NumberToFormDTO>> getNumbersForFrom(@PathVariable int hotelId) {
+        List<NumberToFormDTO> numbers = numberService.getNumbersForHotel(hotelId);
+        return ResponseEntity.ok(numbers);
+    }
+
 
     private NumberDTO convertToNumberDTO(Number number){
         return modelMapper.map(number,NumberDTO.class);

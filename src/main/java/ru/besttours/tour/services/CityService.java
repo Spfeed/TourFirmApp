@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.besttours.tour.dto.CityDTO;
 import ru.besttours.tour.dto.CityForCityDTO;
 import ru.besttours.tour.dto.CityForSearchFormDTO;
+import ru.besttours.tour.dto.HotelForDynTourCreateionDTO;
 import ru.besttours.tour.models.City;
 import ru.besttours.tour.models.Country;
 import ru.besttours.tour.models.Hotel;
@@ -62,12 +63,20 @@ public class CityService {
         return cityRepository.findByName(name).orElse(null);
     }
 
-    public List<String> findAllHotels(City city){
-        List<String> hotelsInCity = new ArrayList<>();
-        for (Hotel hotel : city.getHotels()){
-            hotelsInCity.add(hotel.getName());
+    public List<HotelForDynTourCreateionDTO> findAllHotels(int cityId){
+        City city = cityRepository.findById(cityId)
+                .orElseThrow(() -> new IllegalArgumentException("Город с таким id не найден"));
+        List<Hotel> hotels = city.getHotels();
+        List<HotelForDynTourCreateionDTO> dtos = new ArrayList<>();
+
+        for (Hotel hotel : hotels) {
+            HotelForDynTourCreateionDTO dto = new HotelForDynTourCreateionDTO();
+            dto.setId(hotel.getId());
+            dto.setName(hotel.getName());
+            dtos.add(dto);
         }
-        return hotelsInCity;
+
+        return dtos;
     }
 
     public CityForCityDTO getCityInfo (String cityName) {

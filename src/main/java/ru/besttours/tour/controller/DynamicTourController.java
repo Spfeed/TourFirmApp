@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.besttours.tour.dto.DynTourAndBidCreationDTO;
 import ru.besttours.tour.dto.DynamicTourDTO;
 import ru.besttours.tour.models.City;
 import ru.besttours.tour.models.DynamicTour;
@@ -90,7 +91,22 @@ public class DynamicTourController {
 
     //OTHER ENDPOINTS
 
-    //TODO эндпоинт создания тура с автоматическим добавлением в отношение заявка на динамический тур
+    @PostMapping("/addTourAndBid")
+    public void createDynTourWithBid(@RequestBody DynTourAndBidCreationDTO dto) {
+        dynamicTourService.addDynTourWithBid(
+               dto.getUserId(),
+                dto.getCityStart(),
+                dto.getCityEnd(),
+                dto.getHotelId(),
+                dto.getNumberId(),
+                dto.getNumAdults(),
+                dto.getNumChildren(),
+                dto.getFoodTypeId(),
+                dto.getDuration(),
+                dto.getDescription(),
+                dto.getDateStart()
+        );
+    }
 
     private DynamicTourDTO convertToDynamicTourDTO(DynamicTour dynamicTour){
         return modelMapper.map(dynamicTour, DynamicTourDTO.class);

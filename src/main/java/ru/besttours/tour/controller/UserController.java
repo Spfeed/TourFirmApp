@@ -6,8 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.besttours.tour.dto.TourBidForPC;
+import ru.besttours.tour.dto.TourStatusChangeDTO;
 import ru.besttours.tour.dto.UserDTO;
+import ru.besttours.tour.dto.UserDTOForGlobalState;
 import ru.besttours.tour.models.User;
+import ru.besttours.tour.services.DynamicTourBidService;
+import ru.besttours.tour.services.PackageTourBidService;
 import ru.besttours.tour.services.SecurityService;
 import ru.besttours.tour.services.UserService;
 
@@ -22,13 +27,17 @@ public class UserController {
     private final ModelMapper modelMapper;
 
     private final SecurityService securityService;
+    private final PackageTourBidService packageTourBidService;
+    private final DynamicTourBidService dynamicTourBidService;
 
     @Autowired
     public UserController(UserService userService, ModelMapper modelMapper,
-                          SecurityService securityService) {
+                          SecurityService securityService, PackageTourBidService packageTourBidService, DynamicTourBidService dynamicTourBidService) {
         this.userService = userService;
         this.modelMapper = modelMapper;
         this.securityService = securityService;
+        this.packageTourBidService = packageTourBidService;
+        this.dynamicTourBidService = dynamicTourBidService;
     }
 
     //BASED ENDPOINTS DEV ONLY
@@ -45,13 +54,13 @@ public class UserController {
     }
 
     @PostMapping("/signUp")
-    public ResponseEntity<Integer> signUp(@RequestBody @Valid UserDTO userDTO) {
+    public ResponseEntity<UserDTOForGlobalState> signUp(@RequestBody @Valid UserDTO userDTO) {
         return ResponseEntity.ok(securityService.signUp(userDTO));
     }
 
 
     @PostMapping("/signIn")
-    public ResponseEntity<Integer> signIn(@RequestParam String email, @RequestParam String password){
+    public ResponseEntity<UserDTOForGlobalState> signIn(@RequestParam String email, @RequestParam String password){
         return ResponseEntity.ok(securityService.signIn(email, password));
     }
 
@@ -83,6 +92,32 @@ public class UserController {
         return convertToUserDTO(userService.findByEmail(email));
     }
 
+    @GetMapping("/{userId}/bids")
+    public ResponseEntity<List<TourBidForPC>> getUserBids (@PathVariable int userId) {
+        List<TourBidForPC> bids = userService.getBidsForPC(userId);
+        return ResponseEntity.ok(bids);
+    }
+
+    @GetMapping("/getAllBidsToAccept")
+    public ResponseEntity<List<TourBidForPC>> getAllBids () {
+        List<TourBidForPC> bids = userService.getBidsForAdminToAccept();
+        return ResponseEntity.ok(bids);
+    }
+
+    @GetMapping("/getAllBidsAccepted")
+    public ResponseEntity<List<TourBidForPC>> getAllBidsAccepted () {
+        List<TourBidForPC>  bids = userService.getBidsForAdminHistory();
+        return ResponseEntity.ok(bids);
+    }
+
+    @PutMapping("/changeTourBidStatus")
+    public void changeTourBidStatus (@RequestBody TourStatusChangeDTO dto) {
+        if (dto.isDynamic()) {
+        dynamicTourBidService.updatePackageTourStatus(dto.getTourId(), dto.getUserId(), dto.isStatus());
+        } else {
+            packageTourBidService.updatePackageTourStatus(dto.getTourId(), dto.getUserId(), dto.isStatus());
+        }
+    }
 
     private UserDTO convertToUserDTO(User user) {
         return modelMapper.map(user, UserDTO.class);

@@ -28,11 +28,13 @@ public class PackageTourController {
     private final TourOperatorService tourOperatorService;
     private final TransferService transferService;
 
+    private final PackageTourBidService packageTourBidService;
+
     @Autowired
     public PackageTourController(PackageTourService packageTourService, ModelMapper modelMapper,
                                  NumberService numberService, CityService cityService,
                                  FoodTypeService foodTypeService, TourOperatorService tourOperatorService,
-                                 TransferService transferService) {
+                                 TransferService transferService, PackageTourBidService packageTourBidService) {
         this.packageTourService = packageTourService;
         this.modelMapper = modelMapper;
         this.numberService = numberService;
@@ -40,6 +42,7 @@ public class PackageTourController {
         this.foodTypeService = foodTypeService;
         this.tourOperatorService = tourOperatorService;
         this.transferService = transferService;
+        this.packageTourBidService = packageTourBidService;
     }
 
     //BASED ENDPOINTS
@@ -131,6 +134,31 @@ public class PackageTourController {
     public ResponseEntity<PackageTourForTourPageDTO> getPackageTourInfo (@PathVariable int tourId) {
         PackageTourForTourPageDTO tourInfo = packageTourService.getTourInfo(tourId);
         return ResponseEntity.ok(tourInfo);
+    }
+
+    @PostMapping("/createPackageTourBid")
+    public void createPackageTourBid (@RequestBody CreatePackageTourBidDTO createPackageTourBidDTO) {
+        packageTourBidService.createPackageTourBid(createPackageTourBidDTO.getUserId(),
+                createPackageTourBidDTO.getTourId());
+    }
+
+    @GetMapping("/{userId}/tourMain")
+    public ResponseEntity<List<PackageTourDTOForMainPC>> getToursForMainPC(@PathVariable int userId) {
+        List<PackageTourDTOForMainPC> tours = packageTourBidService.getToursForPC(userId, 2);
+        return ResponseEntity.ok(tours);
+    }
+
+    @GetMapping("/{userId}/tourHistory")
+    public ResponseEntity<List<PackageTourDTOForMainPC>> getToursForHistory(@PathVariable int userId) {
+        int toursCount = packageTourBidService.getBidsForUserCount(userId);
+        List<PackageTourDTOForMainPC> tours = packageTourBidService.getToursForPC(userId, toursCount);
+        return ResponseEntity.ok(tours);
+    }
+
+    @GetMapping("/{tourId}/historyInfo")
+    public ResponseEntity<PackageTourForHistoryDTO> getTourHistoryInfo(@PathVariable int tourId) {
+        PackageTourForHistoryDTO tour = packageTourService.getTourInfoForHistory(tourId);
+        return ResponseEntity.ok(tour);
     }
 
     private PackageTourDTO convertToPackageTourDTO(PackageTour packageTour){
