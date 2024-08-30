@@ -3,9 +3,11 @@ package ru.besttours.tour.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.besttours.tour.dto.PcCrudDTO;
 import ru.besttours.tour.models.Transfer;
 import ru.besttours.tour.repo.TransferRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -41,5 +43,18 @@ public class TransferService {
     @Transactional
     public void delete(int id) {
         transferRepository.deleteById(id);
+    }
+
+    public List<PcCrudDTO> getTransferForCrudPC() {
+        List<Transfer> transfers = transferRepository.findAll();
+        List<PcCrudDTO> dtos = new ArrayList<>();
+
+        for (Transfer transfer: transfers) {
+            PcCrudDTO dto = new PcCrudDTO();
+            dto.setId(transfer.getId());
+            dto.setName(transfer.getCompany());
+            dtos.add(dto);
+        }
+        return dtos;
     }
 }

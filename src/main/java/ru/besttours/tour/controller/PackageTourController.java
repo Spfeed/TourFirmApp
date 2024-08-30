@@ -54,42 +54,78 @@ public class PackageTourController {
     }
 
     @GetMapping("/{id}")
-    public PackageTourDTO getOnePackageTour(@PathVariable int id){
-        return convertToPackageTourDTO(packageTourService.findOne(id));
+    public ResponseEntity<PackageTourDTO> getOnePackageTour(@PathVariable int id){
+        PackageTour packageTour = packageTourService.findOne(id);
+        PackageTourDTO packageTourDTO= new PackageTourDTO();
+        packageTourDTO.setStartCityId(packageTour.getBeginPlace().getId());
+        packageTourDTO.setEndCityId(packageTour.getEndPlace().getId());
+        packageTourDTO.setFoodTypeId(packageTour.getFoodType().getId());
+        packageTourDTO.setTransferId(packageTour.getTransfer().getId());
+        packageTourDTO.setTouroperatorId(packageTour.getTourOperator().getId());
+        packageTourDTO.setNumberId(packageTour.getNumber().getId());
+        packageTourDTO.setDuration(packageTour.getDuration());
+        packageTourDTO.setDescription(packageTour.getDescription());
+        packageTourDTO.setDateStart(packageTour.getDateStart());
+        packageTourDTO.setNumAdults(packageTour.getNumAdults());
+        packageTourDTO.setNumChildren(packageTour.getNumChildren());
+        packageTourDTO.setName(packageTour.getName());
+        return ResponseEntity.ok(packageTourDTO);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<HttpStatus> createPackageTour(@RequestBody @Valid PackageTourDTO  packageTourDTO,
-                                                        int numberId, int beginCityId, int endCityId,
-                                                        int foodTypeId, int tourOperatorId,
-                                                        int transferId){
-        //TODO обработка всех исключений как в динамическом туре
-        PackageTour packageTour = convertToPackageTour(packageTourDTO);
-        Number number = numberService.findOne(numberId);
-        City beginCity = cityService.findOne(beginCityId);
-        City endCity = cityService.findOne(endCityId);
-        FoodType foodType = foodTypeService.findOne(foodTypeId);
-        TourOperator tourOperator = tourOperatorService.findOne(tourOperatorId);
-        Transfer transfer = transferService.findOne(transferId);
-        packageTour.setNumber(number);
-        packageTour.setBeginPlace(beginCity);
-        packageTour.setEndPlace(endCity);
-        packageTour.setFoodType(foodType);
+    public ResponseEntity<HttpStatus> createPackageTour(@RequestBody @Valid PackageTourDTO  packageTourDTO){
+
+        City startCity = cityService.findOne(packageTourDTO.getStartCityId());
+        City endCity = cityService.findOne(packageTourDTO.getEndCityId());
+        TourOperator tourOperator = tourOperatorService.findOne(packageTourDTO.getTouroperatorId());
+        Transfer transfer = transferService.findOne(packageTourDTO.getTransferId());
+        FoodType foodType = foodTypeService.findOne(packageTourDTO.getFoodTypeId());
+        Number number = numberService.findOne(packageTourDTO.getNumberId());
+
+        PackageTour packageTour = new PackageTour();
+        packageTour.setName(packageTourDTO.getName());
+        packageTour.setNumAdults(packageTourDTO.getNumAdults());
+        packageTour.setNumChildren(packageTourDTO.getNumChildren());
+        packageTour.setDuration(packageTourDTO.getDuration());
+        packageTour.setDateStart(packageTourDTO.getDateStart());
         packageTour.setTourOperator(tourOperator);
         packageTour.setTransfer(transfer);
-        packageTour = packageTourService.create(packageTour);
-        if (packageTour == null)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        packageTour.setBeginPlace(startCity);
+        packageTour.setEndPlace(endCity);
+        packageTour.setNumber(number);
+        packageTour.setFoodType(foodType);
+
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PutMapping()
-    public ResponseEntity<PackageTourDTO> updatePackageTour(@RequestBody @Valid PackageTourDTO packageTourDTO,
+    public ResponseEntity<Void> updatePackageTour(@RequestBody @Valid PackageTourDTO packageTourDTO,
                                                             int id){
-        PackageTour packageTour = packageTourService.update(id, convertToPackageTour(packageTourDTO));
-        if(packageTour == null)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        return ResponseEntity.ok(convertToPackageTourDTO(packageTour));
+        PackageTour packageTour = new PackageTour();
+        packageTour.setName(packageTourDTO.getName());
+        packageTour.setDateStart(packageTourDTO.getDateStart());
+        packageTour.setDuration(packageTourDTO.getDuration());
+        packageTour.setNumAdults(packageTourDTO.getNumAdults());
+        packageTour.setNumChildren(packageTourDTO.getNumChildren());
+        packageTour.setDescription(packageTourDTO.getDescription());
+        packageTour.setCostPack(packageTourDTO.getCostPack());
+
+        Number number = numberService.findOne(packageTourDTO.getNumberId());
+        City startCity = cityService.findOne(packageTourDTO.getStartCityId());
+        City endCity = cityService.findOne(packageTourDTO.getEndCityId());
+        TourOperator tourOperator = tourOperatorService.findOne(packageTourDTO.getTouroperatorId());
+        FoodType foodType = foodTypeService.findOne(packageTourDTO.getFoodTypeId());
+        Transfer transfer = transferService.findOne(packageTourDTO.getTransferId());
+
+        packageTour.setNumber(number);
+        packageTour.setBeginPlace(startCity);
+        packageTour.setEndPlace(endCity);
+        packageTour.setTourOperator(tourOperator);
+        packageTour.setFoodType(foodType);
+        packageTour.setTransfer(transfer);
+
+        packageTourService.update(id, packageTour);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
@@ -159,6 +195,12 @@ public class PackageTourController {
     public ResponseEntity<PackageTourForHistoryDTO> getTourHistoryInfo(@PathVariable int tourId) {
         PackageTourForHistoryDTO tour = packageTourService.getTourInfoForHistory(tourId);
         return ResponseEntity.ok(tour);
+    }
+
+    @GetMapping("/pc-crud")
+    public ResponseEntity<List<PcCrudDTO>> getTourForCrudPC() {
+        List<PcCrudDTO> tours = packageTourService.getTourForCrudPC();
+        return ResponseEntity.ok(tours);
     }
 
     private PackageTourDTO convertToPackageTourDTO(PackageTour packageTour){

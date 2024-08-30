@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.besttours.tour.dto.TourBidForPC;
+import ru.besttours.tour.dto.UserDTOForPC;
 import ru.besttours.tour.models.*;
 import ru.besttours.tour.repo.*;
 
@@ -25,13 +26,16 @@ public class UserService {
 
     private final DynamicTourRepository dynamicTourRepository;
 
+    private final AccessLevelRepository accessLevelRepository;
+
     @Autowired
-    public UserService(UserRepository userRepository, PackageTourBidRepository packageTourBidRepository, DynamicTourBidRepository dynamicTourBidRepository, PackageTourRepository packageTourRepository, DynamicTourRepository dynamicTourRepository) {
+    public UserService(UserRepository userRepository, PackageTourBidRepository packageTourBidRepository, DynamicTourBidRepository dynamicTourBidRepository, PackageTourRepository packageTourRepository, DynamicTourRepository dynamicTourRepository, AccessLevelRepository accessLevelRepository) {
         this.userRepository = userRepository;
         this.packageTourBidRepository = packageTourBidRepository;
         this.dynamicTourBidRepository = dynamicTourBidRepository;
         this.packageTourRepository = packageTourRepository;
         this.dynamicTourRepository = dynamicTourRepository;
+        this.accessLevelRepository = accessLevelRepository;
     }
 
     //BASED CRUD
@@ -114,6 +118,59 @@ public class UserService {
         }
 
         return bids;
+    }
+
+    public List<UserDTOForPC> getUsersForPC(String status) {
+        List<User> users = userRepository.findAll();
+        List<UserDTOForPC> dtos = new ArrayList<>();
+
+        List<AccessLevel> allAccessLevels = accessLevelRepository.findAll();
+        for (AccessLevel accessLevel : allAccessLevels){
+            System.out.println("Уровень доступа: " + accessLevel.getName());
+        }
+
+        System.out.println("Ищем уровень доступа: " + status);
+
+        AccessLevel accessLevel = accessLevelRepository.findByName(status)
+                .orElseThrow(() -> new IllegalArgumentException("Уровень доступа не найден"));
+        System.out.println("Найден уровень доступа: " + accessLevel.getName());
+
+        for (User user : users) {
+            UserDTOForPC dto = new UserDTOForPC();
+            if (accessLevel.getName().equals("ADMIN")){
+                if (!user.getAccessLevel().getName().equals("ADMIN")){
+                    dto.setName(user.getName());
+                    dto.setLastname(user.getLastName());
+                    dto.setEmail(user.getEmail());
+                    dto.setStatus(user.getAccessLevel().getName());
+                    dtos.add(dto);
+                }
+            } else {
+                if (!user.getAccessLevel().getName().equals("ADMIN") && !user.getAccessLevel().getName().equals("MANAGER")){
+                    dto.setName(user.getName());
+                    dto.setLastname(user.getLastName());
+                    dto.setEmail(user.getEmail());
+                    dto.setStatus(user.getAccessLevel().getName());
+                    dtos.add(dto);
+                }
+            }
+        }
+        return dtos;
+    }
+
+    @Transactional
+    public void changeUserStatus(String email){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь с таким email не найден!"));
+        AccessLevel accessLevel = user.getAccessLevel();
+        if (accessLevel.getName().equals("USER")){
+            user.setAccessLevel(accessLevelRepository.findByName("MANAGER")
+                    .orElseThrow(() -> new IllegalArgumentException("Уровень доступа не найден")));
+        } else {
+            user.setAccessLevel(accessLevelRepository.findByName("USER")
+                    .orElseThrow(() -> new IllegalArgumentException("Уровень доступа не найден")));
+        }
+        userRepository.save(user);
     }
 
     private List<TourBidForPC> getBidsForUser (User user) {

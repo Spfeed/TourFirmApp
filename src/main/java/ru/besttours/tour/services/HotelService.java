@@ -3,6 +3,7 @@ package ru.besttours.tour.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.besttours.tour.dto.PcCrudDTO;
 import ru.besttours.tour.models.Hotel;
 import ru.besttours.tour.models.Photo;
 import ru.besttours.tour.repo.HotelRepository;
@@ -66,6 +67,19 @@ public class HotelService {
         }
 
         return photos;
+    }
+
+    public List<PcCrudDTO> getHotelForCrudPC() {
+        List<Hotel> hotels = hotelRepository.findAll();
+        List<PcCrudDTO> dtos = new ArrayList<>();
+
+        for (Hotel hotel : hotels) {
+            PcCrudDTO dto = new PcCrudDTO();
+            dto.setId(hotel.getId());
+            dto.setName(hotel.getName());
+            dtos.add(dto);
+        }
+        return dtos;
     }
 
 }

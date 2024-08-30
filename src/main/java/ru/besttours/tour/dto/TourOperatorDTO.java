@@ -16,10 +16,7 @@ public class TourOperatorDTO {
     private String site;
 
     private BigDecimal rating;
-
-    public Set<String> getPhotoUrls() {
-        return photoUrls;
-    }
+    
 
     public void setPhotoUrls(Set<String> photoUrls) {
         this.photoUrls = photoUrls;

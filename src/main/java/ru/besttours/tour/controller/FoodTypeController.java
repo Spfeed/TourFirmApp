@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.besttours.tour.dto.FoodTypeDTO;
+import ru.besttours.tour.dto.PcCrudDTO;
 import ru.besttours.tour.models.FoodType;
 import ru.besttours.tour.services.FoodTypeService;
 
@@ -57,6 +58,12 @@ public class FoodTypeController {
     public ResponseEntity<Void> deleteFoodType(@PathVariable int id) {
         foodTypeService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/pc-crud")
+    public ResponseEntity<List<PcCrudDTO>> getFoodTypeForCrudPC() {
+        List<PcCrudDTO> foodTypes = foodTypeService.getFoodTypesForCrudPC();
+        return ResponseEntity.ok(foodTypes);
     }
 
     private FoodTypeDTO convertToFoodTypeDTO(FoodType foodType) {

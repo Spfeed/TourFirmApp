@@ -57,10 +57,8 @@ public class DynamicTourController {
     public ResponseEntity<HttpStatus> createDynamicTour(@RequestBody @Valid DynamicTourDTO dynamicTourDTO,
                                                         int numberId, int beginCityId,
                                                         int endCityId, int foodTypeId){
-        //TODO проверка на существование такого же тура(хоть id у всех и уникальный)
         DynamicTour dynamicTour = convertToDynamicTour(dynamicTourDTO);
         Number number = numberService.findOne(numberId);
-        //TODO сделать исключения и errorResponse для всех id
         City beginCity = cityService.findOne(beginCityId);
         City endCity = cityService.findOne(endCityId);
         FoodType foodType = foodTypeService.findOne(foodTypeId);

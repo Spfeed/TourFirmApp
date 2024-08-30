@@ -3,8 +3,10 @@ package ru.besttours.tour.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.besttours.tour.dto.PcCrudDTO;
 import ru.besttours.tour.repo.ServiceRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -48,5 +50,18 @@ public class ServiceService {
 
     public ru.besttours.tour.models.Service findByName(String name) {
         return serviceRepository.findByName(name).orElse(null);
+    }
+
+    public List<PcCrudDTO> getServiceForCrudPC() {
+        List<ru.besttours.tour.models.Service> services = serviceRepository.findAll();
+        List<PcCrudDTO> dtos = new ArrayList<>();
+
+        for (ru.besttours.tour.models.Service service : services) {
+            PcCrudDTO dto = new PcCrudDTO();
+            dto.setId(service.getId());
+            dto.setName(service.getName());
+            dtos.add(dto);
+        }
+        return dtos;
     }
 }

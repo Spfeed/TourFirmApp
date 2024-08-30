@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.besttours.tour.dto.PcCrudDTO;
 import ru.besttours.tour.dto.TransferDTO;
 import ru.besttours.tour.models.Transfer;
 import ru.besttours.tour.services.TransferService;
@@ -57,6 +58,12 @@ public class TransferController {
     public ResponseEntity<Void> deleteTransfer(@PathVariable int id){
         transferService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/pc-crud")
+    public ResponseEntity<List<PcCrudDTO>> getTransfersForCrudPC() {
+        List<PcCrudDTO> transfers = transferService.getTransferForCrudPC();
+        return ResponseEntity.ok(transfers);
     }
 
     private TransferDTO convertToTransferDTO(Transfer transfer){

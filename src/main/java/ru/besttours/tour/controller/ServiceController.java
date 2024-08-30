@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.besttours.tour.dto.PcCrudDTO;
 import ru.besttours.tour.dto.ServiceDTO;
 import ru.besttours.tour.models.Service;
 import ru.besttours.tour.services.ServiceService;
@@ -66,6 +67,12 @@ public class ServiceController {
     @GetMapping("/find-name/{serviceName}")
     public ServiceDTO findServiceByName(@PathVariable String serviceName){
         return convertToServiceDTO(serviceService.findByName(serviceName));
+    }
+
+    @GetMapping("/pc-crud")
+    public ResponseEntity<List<PcCrudDTO>> getServiceForCrudPC() {
+        List<PcCrudDTO> services = serviceService.getServiceForCrudPC();
+        return ResponseEntity.ok(services);
     }
 
     private ServiceDTO convertToServiceDTO(Service service){

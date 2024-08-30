@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.besttours.tour.dto.PcCrudDTO;
 import ru.besttours.tour.dto.TourOperatorDTO;
 import ru.besttours.tour.models.TourOperator;
 import ru.besttours.tour.services.TourOperatorService;
@@ -64,6 +65,12 @@ public class TourOperatorController {
     public ResponseEntity<List<TourOperatorDTO>> getAllTourOperatorsWithPhotos () {
         List<TourOperatorDTO> tourOperatorDTOS = tourOperatorService.findAllWithPhotos();
         return ResponseEntity.ok(tourOperatorDTOS);
+    }
+
+    @GetMapping("/pc-crud")
+    public ResponseEntity<List<PcCrudDTO>> getTourOpersForCrudPC() {
+        List<PcCrudDTO> tourOpers = tourOperatorService.getTourOpersForCrudPC();
+        return ResponseEntity.ok(tourOpers);
     }
 
 

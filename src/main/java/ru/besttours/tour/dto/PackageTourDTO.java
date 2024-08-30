@@ -13,6 +13,19 @@ import java.util.Date;
 
 public class PackageTourDTO {
 
+    private int startCityId;
+
+    private int endCityId;
+
+    private int numberId;
+
+    private int foodTypeId;
+
+    private int transferId;
+
+    private int touroperatorId;
+
+
     private String name;
 
     @Temporal(TemporalType.DATE)
@@ -82,5 +95,53 @@ public class PackageTourDTO {
 
     public void setCostPack(BigDecimal costPack) {
         this.costPack = costPack;
+    }
+
+    public int getStartCityId() {
+        return startCityId;
+    }
+
+    public void setStartCityId(int startCityId) {
+        this.startCityId = startCityId;
+    }
+
+    public int getEndCityId() {
+        return endCityId;
+    }
+
+    public void setEndCityId(int endCityId) {
+        this.endCityId = endCityId;
+    }
+
+    public int getNumberId() {
+        return numberId;
+    }
+
+    public void setNumberId(int numberId) {
+        this.numberId = numberId;
+    }
+
+    public int getFoodTypeId() {
+        return foodTypeId;
+    }
+
+    public void setFoodTypeId(int foodTypeId) {
+        this.foodTypeId = foodTypeId;
+    }
+
+    public int getTransferId() {
+        return transferId;
+    }
+
+    public void setTransferId(int transferId) {
+        this.transferId = transferId;
+    }
+
+    public int getTouroperatorId() {
+        return touroperatorId;
+    }
+
+    public void setTouroperatorId(int touroperatorId) {
+        this.touroperatorId = touroperatorId;
     }
 }

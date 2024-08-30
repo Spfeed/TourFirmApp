@@ -1,8 +1,11 @@
 package ru.besttours.tour.dto;
+import org.springframework.web.multipart.MultipartFile;
 import ru.besttours.tour.models.City;
 import java.math.BigDecimal;
 
 public class HotelDTO {
+
+    private int cityId;
 
     private String name;
 
@@ -13,6 +16,8 @@ public class HotelDTO {
     private String information;
 
     private String services;
+
+    private MultipartFile[] photos;
 
     public String getName() {
         return name;
@@ -52,5 +57,21 @@ public class HotelDTO {
 
     public void setServices(String services) {
         this.services = services;
+    }
+
+    public MultipartFile[] getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(MultipartFile[] photos) {
+        this.photos = photos;
+    }
+
+    public int getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
     }
 }

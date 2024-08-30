@@ -1,33 +1,46 @@
 package ru.besttours.tour.controller;
 
+
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.ServletContextAware;
+import org.springframework.web.multipart.MultipartFile;
 import ru.besttours.tour.dto.*;
-import ru.besttours.tour.models.City;
 import ru.besttours.tour.models.Country;
+import ru.besttours.tour.models.Photo;
 import ru.besttours.tour.services.CountryService;
 import ru.besttours.tour.services.PackageTourService;
+import ru.besttours.tour.services.PhotoService;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/countries")
-public class CountryController {
+public class CountryController  {
 
     private final CountryService countryService;
     private final ModelMapper modelMapper;
-
+    private final PhotoService photoService;
     private final PackageTourService packageTourService;
 
+
+
     @Autowired
-    public CountryController(CountryService countryService, ModelMapper modelMapper, PackageTourService packageTourService) {
+    public CountryController(CountryService countryService, ModelMapper modelMapper, PhotoService photoService, PackageTourService packageTourService) {
         this.countryService = countryService;
         this.modelMapper = modelMapper;
+        this.photoService = photoService;
         this.packageTourService = packageTourService;
     }
 
@@ -45,14 +58,46 @@ public class CountryController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<HttpStatus> createCountry(@RequestBody @Valid CountryDTO countryDTO) { //TODO bindingResult
-        Country country = convertToCountry(countryDTO);
-        country = countryService.create(country);
+    public ResponseEntity<HttpStatus> createCountry(@ModelAttribute @Valid CountryDTO countryDTO) throws IOException {
+        String relativeBasePath = "src/main/resources/static/images/countries/";
+        String countryFolder = countryDTO.getName().replace(" ", "_");
+        String photoFilename = countryDTO.getPhoto().getOriginalFilename();
+        String photoPath = "images/countries/" + countryFolder + "/" + photoFilename;
 
-        //TODO норм проверка с исключением
+        // Использование текущей рабочей директории для создания абсолютного пути
+        Path currentWorkingDir = Paths.get("").toAbsolutePath();
+        Path absoluteBasePath = currentWorkingDir.resolve(relativeBasePath);
+        Path absolutePhotoPath = absoluteBasePath.resolve(countryFolder).resolve(photoFilename);
 
-        if(country == null)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        System.out.println("Absolute base path: " + absoluteBasePath);
+        System.out.println("Absolute photo path: " + absolutePhotoPath);
+
+        Files.createDirectories(absolutePhotoPath.getParent());
+        countryDTO.getPhoto().transferTo(absolutePhotoPath.toFile());
+
+        Photo photoEntity = new Photo(photoPath);
+        photoService.create(photoEntity);
+
+        Country country = new Country();
+        country.setName(countryDTO.getName());
+        country.setDescription(countryDTO.getDescription());
+        country.setVisa(countryDTO.isVisa());
+        country.setLanguage(countryDTO.getLanguage());
+        country.setCurrency(countryDTO.getCurrency());
+        country.setLocalTime(countryDTO.getLocalTime());
+        country.setReligion(countryDTO.getReligion());
+
+        countryService.create(country);
+
+        country.getPhotos().add(photoEntity);
+        if (photoEntity.getCountries() == null) {
+            photoEntity.setCountries(new HashSet<>());
+        }
+        photoEntity.getCountries().add(country);
+
+        Country temp = countryService.findByName(country.getName());
+
+        countryService.update(temp.getId(), country);
 
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -79,7 +124,6 @@ public class CountryController {
     @GetMapping("/all-cities/{countryName}")
     public List<String> getAllCountryCities(@PathVariable String countryName){
         Country country = countryService.findByName(countryName);
-        //TODO обработка исключения
         return countryService.findCities(country);
     }
 

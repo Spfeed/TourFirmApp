@@ -3,10 +3,7 @@ package ru.besttours.tour.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.besttours.tour.dto.CityDTO;
-import ru.besttours.tour.dto.CityForCityDTO;
-import ru.besttours.tour.dto.CityForSearchFormDTO;
-import ru.besttours.tour.dto.HotelForDynTourCreateionDTO;
+import ru.besttours.tour.dto.*;
 import ru.besttours.tour.models.City;
 import ru.besttours.tour.models.Country;
 import ru.besttours.tour.models.Hotel;
@@ -109,5 +106,20 @@ public class CityService {
             cityForSearchFormDTOList.add(new CityForSearchFormDTO(city.getId(), city.getName()));
         }
         return cityForSearchFormDTOList;
+    }
+
+    public List<PcCrudDTO> getCitiesForCrudPc() {
+        List<City> cities = cityRepository.findAll();
+        List<PcCrudDTO> dtos = new ArrayList<>();
+
+        for (City city : cities) {
+            PcCrudDTO dto = new PcCrudDTO();
+            if (!city.getCountry().getName().equals("Россия")){
+                dto.setId(city.getId());
+                dto.setName(city.getName());
+                dtos.add(dto);
+            }
+        }
+        return dtos;
     }
 }

@@ -3,10 +3,7 @@ package ru.besttours.tour.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.besttours.tour.dto.PackageTourForCountryDTO;
-import ru.besttours.tour.dto.PackageTourForHistoryDTO;
-import ru.besttours.tour.dto.PackageTourForModalDTO;
-import ru.besttours.tour.dto.PackageTourForTourPageDTO;
+import ru.besttours.tour.dto.*;
 import ru.besttours.tour.models.*;
 import ru.besttours.tour.repo.CityRepository;
 import ru.besttours.tour.repo.CountryRepository;
@@ -20,17 +17,17 @@ import java.util.stream.Collectors;
 public class PackageTourService {
 
     private final PackageTourRepository packageTourRepository;
+    private final CountryRepository countryRepository;
+
+    private final CityRepository cityRepository;
 
     @Autowired
-    public PackageTourService(PackageTourRepository packageTourRepository) {
+    public PackageTourService(PackageTourRepository packageTourRepository, CountryRepository countryRepository,
+                              CityRepository cityRepository) {
         this.packageTourRepository = packageTourRepository;
+        this.countryRepository = countryRepository;
+        this.cityRepository = cityRepository;
     }
-
-    @Autowired
-    private CityRepository cityRepository;
-
-    @Autowired
-    private CountryRepository countryRepository;
 
     //BASED CRUD
 
@@ -77,7 +74,7 @@ public class PackageTourService {
     }
 
     public List<PackageTourForCountryDTO> getToursByCity(String cityName) {
-        City city = cityRepository.findByName(cityName).orElseThrow(() -> new RuntimeException("Город не найден"));
+        City city = cityRepository.findByName(cityName).orElseThrow(() -> new IllegalArgumentException("Город не найден"));
         List<PackageTour> tours = city.getBeginPlacePackageTours();
         List<PackageTour> limitedTours = new ArrayList<>();
         limitedTours = tours.stream().limit(3).collect(Collectors.toList());
@@ -87,7 +84,7 @@ public class PackageTourService {
     }
 
     public PackageTourForCountryDTO getActualTourForCity (String cityName) {
-        City city = cityRepository.findByName(cityName).orElseThrow(() -> new RuntimeException("Город не найден"));
+        City city = cityRepository.findByName(cityName).orElseThrow(() -> new IllegalArgumentException("Город не найден"));
         List<PackageTour> tours = city.getBeginPlacePackageTours();
         PackageTour actualTour = tours.get(tours.size()-1);
         //TODO заменить последний элемент на тур с наибольшим количеством броней.
@@ -97,7 +94,7 @@ public class PackageTourService {
     public List<PackageTourForModalDTO> packageToursForModal (int fromId, int toId, Date startDate, Date endDate,
                                                               int days, int adults, int children) {
 
-        Country country = countryRepository.findById(toId).orElseThrow(() -> new RuntimeException("Страна не найдена"));
+        Country country = countryRepository.findById(toId).orElseThrow(() -> new IllegalArgumentException("Страна не найдена"));
         List<City> cities = country.getCities();
 
         List<PackageTour> tours = new ArrayList<>();
@@ -112,7 +109,7 @@ public class PackageTourService {
     }
 
     public PackageTourForTourPageDTO getTourInfo (int id) {
-        PackageTour tour = packageTourRepository.findById(id).orElseThrow(() -> new RuntimeException("Тур с таким id не найден!"));
+        PackageTour tour = packageTourRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Тур с таким id не найден!"));
 
         PackageTourForTourPageDTO dto = new PackageTourForTourPageDTO();
 
@@ -184,6 +181,19 @@ public class PackageTourService {
         dto.setServices(servicesName);
 
         return dto;
+    }
+
+    public List<PcCrudDTO> getTourForCrudPC() {
+        List<PackageTour> packageTours = packageTourRepository.findAll();
+        List<PcCrudDTO> dtos = new ArrayList<>();
+
+        for (PackageTour packageTour: packageTours) {
+            PcCrudDTO dto = new PcCrudDTO();
+            dto.setId(packageTour.getId());
+            dto.setName(packageTour.getName());
+            dtos.add(dto);
+        }
+        return dtos;
     }
 
     //PRIVATE METHODS

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.besttours.tour.dto.NumberTypeDTO;
+import ru.besttours.tour.dto.PcCrudDTO;
 import ru.besttours.tour.models.NumberType;
 import ru.besttours.tour.services.NumberTypeService;
 
@@ -57,6 +58,12 @@ public class NumberTypeController {
     public ResponseEntity<Void> deleteNumberType(@PathVariable int id){
         numberTypeService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/pc-crud")
+    public ResponseEntity<List<PcCrudDTO>> getNumberTypeForCrudPC() {
+        List<PcCrudDTO> numberTypes = numberTypeService.getNumberTypeForCrudPC();
+        return ResponseEntity.ok(numberTypes);
     }
 
     private NumberTypeDTO convertToNumberTypeDTO(NumberType numberType){

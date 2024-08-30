@@ -13,7 +13,7 @@ public class DynamicTourBid {
     private DynamicTourUserId id;
 
     @Column(name = "status")
-    @NotNull(message = "ВТФ нуль булево значение???")
+    @NotNull(message = "Стаутс не может быть null!")
     private boolean status;
 
     @Column(name = "created_at")

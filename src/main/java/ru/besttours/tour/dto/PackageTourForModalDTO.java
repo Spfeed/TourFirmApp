@@ -107,4 +107,6 @@ public class PackageTourForModalDTO {
     public void setFoodId(int foodId) {
         this.foodId = foodId;
     }
+
+
 }

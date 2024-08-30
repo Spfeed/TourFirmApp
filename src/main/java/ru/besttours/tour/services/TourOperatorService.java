@@ -3,11 +3,13 @@ package ru.besttours.tour.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.besttours.tour.dto.PcCrudDTO;
 import ru.besttours.tour.dto.TourOperatorDTO;
 import ru.besttours.tour.models.Photo;
 import ru.besttours.tour.models.TourOperator;
 import ru.besttours.tour.repo.TourOperatorRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,6 +54,19 @@ public class TourOperatorService {
     public List<TourOperatorDTO> findAllWithPhotos() {
         List<TourOperator> tourOperators = tourOperatorRepository.findAll();
         return tourOperators.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    public List<PcCrudDTO> getTourOpersForCrudPC() {
+        List<TourOperator> tourOperators = tourOperatorRepository.findAll();
+        List<PcCrudDTO> dtos = new ArrayList<>();
+
+        for (TourOperator tourOperator: tourOperators) {
+            PcCrudDTO dto = new PcCrudDTO();
+            dto.setId(tourOperator.getId());
+            dto.setName(tourOperator.getName());
+            dtos.add(dto);
+        }
+        return dtos;
     }
 
     private TourOperatorDTO mapToDTO(TourOperator tourOperator) {

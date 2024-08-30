@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.besttours.tour.dto.HotelDTO;
 import ru.besttours.tour.dto.NumberDTO;
+import ru.besttours.tour.dto.NumberForCrudDTO;
 import ru.besttours.tour.dto.NumberToFormDTO;
 import ru.besttours.tour.models.Hotel;
 import ru.besttours.tour.models.Number;
@@ -42,22 +44,27 @@ public class NumberController {
     }
 
     @GetMapping("/{id}")
-    public NumberDTO getOneNumber(@PathVariable int id){
-        return convertToNumberDTO(numberService.findOne(id));
+    public ResponseEntity<NumberDTO> getOneNumber(@PathVariable int id){
+        Number number = numberService.findOne(id);
+        NumberDTO numberDTO = new NumberDTO();
+        numberDTO.setHotelId(number.getHotel().getId());
+        numberDTO.setNumberTypeId(number.getNumberType().getId());
+        numberDTO.setDescription(number.getDescription());
+        return ResponseEntity.ok(numberDTO);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<HttpStatus> createNumber (@RequestBody @Valid NumberDTO numberDTO, String hotelName, int numberTypeId){
-        Number number = convertToNumber(numberDTO);
-        Hotel hotel = hotelService.findByName(hotelName);
-        NumberType numberType = numberTypeService.findOne(numberTypeId);
-        if (hotel == null || numberType == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<HttpStatus> createNumber (@RequestBody @Valid NumberDTO numberDTO){
+        Hotel hotel = hotelService.findOne(numberDTO.getHotelId());
+        NumberType numberType = numberTypeService.findOne(numberDTO.getNumberTypeId());
+
+        Number number = new Number();
         number.setHotel(hotel);
         number.setNumberType(numberType);
-        number = numberService.create(number);
-        if (number == null)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        number.setDescription(numberDTO.getDescription());
+
+        numberService.create(number);
+
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -78,6 +85,12 @@ public class NumberController {
     @GetMapping("/{hotelId}/numbersForForm")
     public ResponseEntity<List<NumberToFormDTO>> getNumbersForFrom(@PathVariable int hotelId) {
         List<NumberToFormDTO> numbers = numberService.getNumbersForHotel(hotelId);
+        return ResponseEntity.ok(numbers);
+    }
+
+    @GetMapping("/pc-crud")
+    public ResponseEntity<List<NumberForCrudDTO>> getNumbersForCrudPC() {
+        List<NumberForCrudDTO> numbers = numberService.getNumberForCrudPC();
         return ResponseEntity.ok(numbers);
     }
 
